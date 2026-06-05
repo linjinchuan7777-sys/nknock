@@ -1,0 +1,14 @@
+{
+  "name": "renata-home",
+  "version": "1.0.0",
+  "description": "Renata's Home with Firebase Integration",
+  "main": "app.js",
+  "scripts": {
+    "start": "echo \"Static website - open index.html directly\""
+  },
+  "author": "Renata",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^12.14.0"
+  }
+}

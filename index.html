@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雷娜塔的家 | RENATA'S HOME</title>
+  
+  <!-- CSS 樣式表 -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- FontAwesome 圖示 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet 地圖樣式與腳本 (用於外出 > 景點功能，免 API Key) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+  <!-- Frutiger Aero 浮動液態氣泡背景 -->
+  <div class="bubbles-container">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <!-- 拜訪中頂部提示橫幅 -->
+  <div class="visiting-banner" id="visiting-banner" style="display: none;">
+    <div class="visiting-banner-content">
+      <span><i class="fa-solid fa-circle-info"></i> 您正在拜訪 <strong id="visiting-name">阿明</strong> 的空間</span>
+      <button class="btn btn-primary btn-sm" id="leave-visiting-btn"><i class="fa-solid fa-arrow-left-long"></i> 返回我的空間</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       頂部導覽區 (Top Bar, Logo Header & Blue Navigation Bar)
+       ========================================================================== -->
+  <header>
+    <!-- 藍色頂部小條 -->
+    <div class="top-bar">
+      <div class="top-bar-container">
+        <div class="top-bar-links">
+          <a href="#" class="top-bar-link" id="top-logout-btn" style="cursor: pointer; display: none;"><i class="fa-solid fa-right-from-bracket"></i> 登出</a>
+        </div>
+        
+        <!-- 搜尋欄 - 修改編號 1-03 -->
+        <div class="search-container">
+          <select class="search-select" id="search-type">
+            <option value="all">全站資訊</option>
+            <option value="書櫃">書櫃</option>
+            <option value="DVD架">DVD架</option>
+            <option value="衣櫃">衣櫃</option>
+            <option value="書桌">書桌</option>
+            <option value="外出">外出</option>
+            <option value="消息">消息</option>
+          </select>
+          <input type="text" class="search-input" id="search-input" placeholder="請輸入關鍵字...">
+          <button class="search-btn" id="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中間 Logo 與 分類導覽網格 - 修改編號 1-01, 1-02, 1-04 -->
+    <div class="logo-nav-section">
+      <a href="#" class="logo" id="logo-btn">
+        <div class="logo-icon">
+          <!-- 自繪精緻向日葵 SVG -->
+          <svg viewBox="0 0 100 100" width="36" height="36" style="display: block;">
+            <!-- 花瓣 -->
+            <g fill="#f1c40f">
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(30, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(60, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(90, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(120, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(150, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(180, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(210, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(240, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(270, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(300, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(330, 50, 50)" />
+            </g>
+            <!-- 第二層交錯花瓣 -->
+            <g fill="#e67e22" transform="scale(0.8) translate(12.5, 12.5)">
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(15, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(45, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(75, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(105, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(135, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(165, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(195, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(225, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(255, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(285, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(315, 50, 50)" />
+              <path d="M50,10 Q45,25 50,40 Q55,25 50,10 Z" transform="rotate(345, 50, 50)" />
+            </g>
+            <!-- 花蕊 -->
+            <circle cx="50" cy="50" r="16" fill="#5c3a21" />
+            <circle cx="50" cy="50" r="12" fill="#3e2723" />
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-zh" id="blog-title-text">雷娜塔的家</span>
+          <span class="logo-en" id="blog-subtitle-text">RENATA'S HOME</span>
+        </div>
+      </a>
+
+      <!-- 六大父類別與子類別選單導覽網格 -->
+      <div class="category-nav-grid">
+        <div class="nav-grid-item" data-category="書櫃">
+          <span class="nav-grid-parent">書櫃：</span>
+          <div class="nav-grid-subs">
+            <a href="#" class="nav-grid-child" data-sub="筆記">筆記</a>
+            <a href="#" class="nav-grid-child" data-sub="書架">書架</a>
+            <a href="#" class="nav-grid-child" data-sub="待辦">待辦</a>
+          </div>
+        </div>
+        <div class="nav-grid-item" data-category="DVD架">
+          <span class="nav-grid-parent">DVD架：</span>
+          <div class="nav-grid-subs">
+            <a href="#" class="nav-grid-child" data-sub="電影">電影</a>
+            <a href="#" class="nav-grid-child" data-sub="遊戲">遊戲</a>
+            <a href="#" class="nav-grid-child" data-sub="音樂">音樂</a>
+          </div>
+        </div>
+        <div class="nav-grid-item" data-category="衣櫃">
+          <span class="nav-grid-parent">衣櫃：</span>
+          <div class="nav-grid-subs">
+            <a href="#" class="nav-grid-child" data-sub="衣服">衣服</a>
+            <a href="#" class="nav-grid-child" data-sub="鞋子">鞋子</a>
+            <a href="#" class="nav-grid-child" data-sub="飾品">飾品</a>
+          </div>
+        </div>
+        <div class="nav-grid-item" data-category="書桌">
+          <span class="nav-grid-parent">書桌：</span>
+          <div class="nav-grid-subs">
+            <a href="#" class="nav-grid-child" data-sub="寵物">寵物</a>
+            <a href="#" class="nav-grid-child" data-sub="手做">手做</a>
+            <a href="#" class="nav-grid-child" data-sub="飲食">飲食</a>
+          </div>
+        </div>
+        <div class="nav-grid-item" data-category="外出">
+          <span class="nav-grid-parent">外出：</span>
+          <div class="nav-grid-subs">
+            <a href="#" class="nav-grid-child" data-sub="景點">景點</a>
+            <a href="#" class="nav-grid-child" data-sub="拜訪">拜訪</a>
+            <a href="#" class="nav-grid-child" data-sub="行程">行程</a>
+          </div>
+        </div>
+        <div class="nav-grid-item" data-category="消息">
+          <span class="nav-grid-parent">消息：</span>
+          <div class="nav-grid-subs">
+            <a href="#" class="nav-grid-child" data-sub="話題">話題</a>
+            <a href="#" class="nav-grid-child" data-sub="情感">情感</a>
+            <a href="#" class="nav-grid-child" data-sub="夢境">夢境</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 藍色橫向導覽列 -->
+    <div class="blue-nav-bar">
+      <div class="blue-nav-container">
+        <ul class="blue-nav-menu" id="blue-nav-menu">
+          <li class="blue-nav-item active" data-tab="all"><a href="#" class="blue-nav-link">首頁</a></li>
+          <li class="blue-nav-item" data-tab="書櫃"><a href="#" class="blue-nav-link">書櫃</a></li>
+          <li class="blue-nav-item" data-tab="DVD架"><a href="#" class="blue-nav-link">DVD架</a></li>
+          <li class="blue-nav-item" data-tab="衣櫃"><a href="#" class="blue-nav-link">衣櫃</a></li>
+          <li class="blue-nav-item" data-tab="書桌"><a href="#" class="blue-nav-link">書桌</a></li>
+          <li class="blue-nav-item" data-tab="外出"><a href="#" class="blue-nav-link">外出</a></li>
+          <li class="blue-nav-item" data-tab="消息"><a href="#" class="blue-nav-link">消息</a></li>
+        </ul>
+        
+        <div class="role-settings-box">
+          <!-- 隱藏原有的角色徽章以確保邏輯正常不報錯 -->
+          <div class="role-badge role-visitor" id="role-badge" style="display: none;">
+            <i class="fa-solid fa-user-clock"></i> <span id="role-text">一般訪客</span>
+          </div>
+          
+          <!-- 通知按鈕 (替代原特權好友位置) -->
+          <button class="settings-btn" id="notification-btn" title="系統通知" style="position: relative; border-radius: 12px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff; padding: 4px 12px; font-weight: 600; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; height: 32px; box-shadow: var(--shadow-sm); transition: all 0.2s;">
+            <i class="fa-solid fa-bell"></i> <span>通知</span>
+            <span class="notification-badge" id="notification-count" style="position: absolute; top: -6px; right: -6px; background: #ff3b30; color: white; border-radius: 50%; font-size: 9px; width: 16px; height: 16px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 1px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">0</span>
+          </button>
+          
+          <button class="settings-btn" id="lock-btn" title="解鎖管理權限/特權好友"><i class="fa-solid fa-key"></i></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       主要內容區域 (Main Wrapper)
+       ========================================================================== -->
+  <div class="main-wrapper">
+    <div class="main-container" id="main-grid">
+      
+      <!-- ==========================================
+           左欄 (Left Column)
+           ========================================== -->
+      <aside class="column" id="left-column">
+        <!-- 最新貼文欄位 (最新貼文的大圖與標題) -->
+        <div class="card" style="padding: 10px;">
+          <div class="card-title" style="margin-bottom: 8px;">
+            <span><i class="fa-solid fa-star"></i> 最新貼文</span>
+          </div>
+          <div class="featured-post-card" id="featured-post-box">
+            <!-- 動態填入 -->
+          </div>
+        </div>
+
+        <!-- 放貼文類別[衣櫃]的所有貼文，新到舊排列 -->
+        <div class="card">
+          <div class="card-title">
+            <span><i class="fa-solid fa-shirt"></i> 衣櫃點滴 (推薦信息)</span>
+          </div>
+          <ul class="wardrobe-post-list" id="wardrobe-posts-box">
+            <!-- 動態填入 -->
+          </ul>
+        </div>
+      </aside>
+
+      <!-- ==========================================
+           中欄 - 多視圖切換區 (Center Column)
+           ========================================== -->
+      <main class="column" style="grid-column: span 1;" id="center-column">
+        
+        <!-- ==========================================
+             首頁預設視圖 (Home View)
+             ========================================== -->
+        <div id="home-view" class="view-panel">
+          <!-- 六大父類別快速標籤 -->
+          <div class="tabs-container" id="home-tabs">
+            <button class="tab-btn active" data-tab="all">全類型</button>
+            <button class="tab-btn" data-tab="書櫃">書櫃</button>
+            <button class="tab-btn" data-tab="DVD架">DVD架</button>
+            <button class="tab-btn" data-tab="衣櫃">衣櫃</button>
+            <button class="tab-btn" data-tab="書桌">書桌</button>
+            <button class="tab-btn" data-tab="外出">外出</button>
+            <button class="tab-btn" data-tab="消息">消息</button>
+          </div>
+
+          <!-- 全類型貼文清單 -->
+          <div class="card">
+            <div class="card-title">
+              <span id="list-title">所有貼文隨筆</span>
+              <span style="font-size: 0.8rem; color: var(--text-light);" id="post-count">共 0 篇</span>
+            </div>
+            <div class="post-list" id="main-posts-list">
+              <!-- 動態填入 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             文章詳情視圖 (Post Detail View)
+             ========================================== -->
+        <div id="post-detail-view" class="view-panel" style="display: none;">
+          <div class="card">
+            <!-- 麵包屑 -->
+            <div class="article-breadcrumbs" id="post-breadcrumbs">
+              首頁 > 消息 > 情感 > 正文
+            </div>
+            
+            <article class="article-body">
+              <div class="article-header">
+                <h1 class="article-title" id="post-detail-title">文章標題</h1>
+                <div class="article-meta-info">
+                  <span>時間: <span id="post-detail-date">2026-06-01 15:30</span></span>
+                  <span>編輯: <span id="post-detail-author">雷娜塔</span></span>
+                  <span>瀏覽次數: <span id="post-detail-views">128</span> 次</span>
+                  <span id="post-detail-privacy-tag" style="display: none;"><span class="post-private-badge">[限好友]</span></span>
+                </div>
+              </div>
+
+              <!-- 核心提示框 -->
+              <div class="article-core-box" id="post-detail-summary">
+                這是一段貼文的摘要簡述。
+              </div>
+
+              <!-- 貼文大圖 -->
+              <img src="" alt="文章圖片" class="article-featured-img" id="post-detail-image" onerror="this.style.display='none'">
+
+              <!-- 文章內文 -->
+              <div class="article-content" id="post-detail-content">
+                <!-- 內文 -->
+              </div>
+
+              <!-- 標籤區 -->
+              <div class="article-tags" id="post-detail-tags">
+                <!-- 標籤 -->
+              </div>
+            </article>
+
+            <!-- 門戶網站特色分享條 - 修改自截圖 2 -->
+            <div class="share-bar">
+              <span>分享到：</span>
+              <div class="share-icons">
+                <a href="#" class="share-icon ie" title="分享到網際網路" onclick="alert('分享成功！')"><i class="fa-brands fa-internet-explorer"></i></a>
+                <a href="#" class="share-icon ppt" title="匯出簡報" onclick="alert('簡報已產生！')"><i class="fa-solid fa-file-powerpoint"></i></a>
+                <a href="#" class="share-icon pic" title="儲存為相片" onclick="alert('圖片已下載！')"><i class="fa-solid fa-image"></i></a>
+                <a href="#" class="share-icon music" title="分享音樂盒" onclick="alert('已加入播放清單！')"><i class="fa-solid fa-music"></i></a>
+              </div>
+            </div>
+
+            <!-- 管理員操作欄 -->
+            <div class="form-submit-row admin-only" style="margin-top: 0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); display: none;">
+              <button class="btn btn-secondary" id="edit-post-btn"><i class="fa-solid fa-edit"></i> 編輯此貼文</button>
+              <button class="btn btn-danger" id="delete-post-btn"><i class="fa-solid fa-trash"></i> 刪除此貼文</button>
+            </div>
+
+            <!-- 上一篇 / 下一篇連結 -->
+            <div class="article-nav">
+              <a href="#" class="article-nav-btn" id="prev-post-btn">
+                上一篇：<span id="prev-post-title">沒有了</span>
+              </a>
+              <a href="#" class="article-nav-btn" id="next-post-btn">
+                下一篇：<span id="next-post-title">沒有了</span>
+              </a>
+            </div>
+
+            <!-- 好友留言區 (Page 7) -->
+            <div class="comments-section" style="margin-top: 30px; border-top: 1px solid rgba(0,168,232,0.2); padding-top: 20px;">
+              <div class="card-title" style="font-size: 14px;">
+                <span><i class="fa-solid fa-comments"></i> 好友留言</span>
+                <span style="font-size: 11px; color: var(--text-light);" id="post-comments-count">共 0 條留言</span>
+              </div>
+              <div class="comments-list" id="post-comments-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <!-- 留言動態插入 -->
+              </div>
+              
+              <!-- 發表留言表單 -->
+              <form id="post-comment-form" style="background: rgba(255,255,255,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.6);">
+                <div style="font-weight: 600; font-size: 12px; margin-bottom: 8px; color: var(--primary-dark);">發表留言：</div>
+                
+                <!-- 留言富文本工具列 -->
+                <div class="rich-editor-toolbar" data-target="post-comment-input" style="margin-bottom: 6px;">
+                  <button type="button" class="tb-btn bold-btn" title="粗體"><i class="fa-solid fa-bold"></i></button>
+                  <select class="tb-select size-select" title="字體大小">
+                    <option value="">大小</option>
+                    <option value="12px">小</option>
+                    <option value="14px">中</option>
+                    <option value="18px">大</option>
+                    <option value="24px">特大</option>
+                  </select>
+                  <select class="tb-select color-select" title="字體顏色">
+                    <option value="">顏色</option>
+                    <option value="#1e272e">預設</option>
+                    <option value="#e74c3c">紅色</option>
+                    <option value="#3498db">藍色</option>
+                    <option value="#2ecc71">綠色</option>
+                    <option value="#f1c40f">黃色</option>
+                    <option value="#9b59b6">紫色</option>
+                  </select>
+                  <div class="emoji-dropdown-container">
+                    <button type="button" class="tb-btn emoji-btn" title="表情符號"><i class="fa-regular fa-face-smile"></i></button>
+                    <div class="emoji-picker-popup">
+                      <span>😊</span><span>😂</span><span>😍</span><span>👍</span><span>🌟</span>
+                      <span>🎉</span><span>🍀</span><span>🌻</span><span>🐱</span><span>🍕</span>
+                      <span>❤️</span><span>💡</span><span>🔥</span><span>✨</span><span>🎵</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row" style="gap: 8px; margin-bottom: 8px;">
+                  <input type="text" class="form-input" id="post-comment-author" placeholder="您的名字（選填）" style="max-width: 150px; font-size: 12px; height: 28px;">
+                  <span style="font-size: 11px; color: var(--text-light); align-self: center;">（預設以當前身份發表）</span>
+                </div>
+                <textarea class="form-textarea" id="post-comment-input" required placeholder="請輸入留言內容..." style="min-height: 80px; font-size: 13px;"></textarea>
+                <div style="text-align: right; margin-top: 8px;">
+                  <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane"></i> 送出留言</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- 底部 5x2 相關貼文推薦 - 門戶小方格推薦 (修改自截圖 2) -->
+            <div class="recommend-section">
+              <div class="card-title" style="font-size: 13px;">
+                <span>推薦信息 (圖片推薦)</span>
+              </div>
+              <div class="recommend-grid" id="recommend-grid-box">
+                <!-- 5 個推薦卡片 -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==========================================
+             書櫃 - 筆記本視圖 (Notebook View)
+             ========================================== -->
+        <div id="notes-view" class="view-panel" style="display: none;">
+          <!-- 筆記富文本工具列 -->
+          <div class="rich-editor-toolbar" data-target="notebook-textarea" style="margin-bottom: 8px; background: rgba(255,255,255,0.6); padding: 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.8);">
+            <button type="button" class="tb-btn bold-btn" title="粗體"><i class="fa-solid fa-bold"></i></button>
+            <select class="tb-select size-select" title="字體大小">
+              <option value="">大小</option>
+              <option value="12px">小</option>
+              <option value="14px">中</option>
+              <option value="18px">大</option>
+              <option value="24px">特大</option>
+            </select>
+            <select class="tb-select color-select" title="字體顏色">
+              <option value="">顏色</option>
+              <option value="#1e272e">預設</option>
+              <option value="#e74c3c">紅色</option>
+              <option value="#3498db">藍色</option>
+              <option value="#2ecc71">綠色</option>
+              <option value="#f1c40f">黃色</option>
+              <option value="#9b59b6">紫色</option>
+            </select>
+            <div class="emoji-dropdown-container">
+              <button type="button" class="tb-btn emoji-btn" title="表情符號"><i class="fa-regular fa-face-smile"></i></button>
+              <div class="emoji-picker-popup">
+                <span>😊</span><span>😂</span><span>😍</span><span>👍</span><span>🌟</span>
+                <span>🎉</span><span>🍀</span><span>🌻</span><span>🐱</span><span>🍕</span>
+                <span>❤️</span><span>💡</span><span>🔥</span><span>✨</span><span>🎵</span>
+              </div>
+            </div>
+          </div>
+          <div class="notebook-container">
+            <div class="notebook-binder">
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+              <div class="notebook-ring"></div>
+            </div>
+            <textarea class="notebook-textarea" id="notebook-textarea" placeholder="在這裡隨手寫下您的靈感與筆記... 離開或重新整理網頁時會自動儲存。"></textarea>
+            <div style="text-align: right; margin-top: 12px; font-size: 11px; color: var(--text-light);" id="notes-save-status">
+              隨手筆記：自動儲存中
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             書櫃 - 書架視圖 (Bookshelf View)
+             ========================================== -->
+        <div id="bookshelf-view" class="view-panel" style="display: none;">
+          <div class="bookshelf-actions" id="bookshelf-actions" style="display: none; margin-bottom: 12px;">
+            <button class="btn btn-primary" id="add-book-btn"><i class="fa-solid fa-plus"></i> 新增書籍封面</button>
+          </div>
+          <div class="bookshelf-room" id="bookshelf-room">
+            <!-- 書架列 -->
+          </div>
+        </div>
+
+        <!-- ==========================================
+             書櫃 - 待辦清單視圖 (Todo View)
+             ========================================== -->
+        <div id="todo-view" class="view-panel" style="display: none;">
+          <div class="card todo-card">
+            <div class="card-title">
+              <span><i class="fa-solid fa-list-check"></i> 待辦清單</span>
+              <span style="font-size: 0.8rem; color: var(--text-light);" id="todo-progress">0% 已完成</span>
+            </div>
+            
+            <form class="todo-form" id="todo-form" style="display: none;">
+              <input type="text" class="todo-input" id="todo-input" placeholder="請輸入待辦事項..." required>
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 新增</button>
+            </form>
+            
+            <ul class="todo-list-container" id="todo-list-box">
+              <!-- 代辦事項 -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             DVD/CD架視圖 (DVD / CD Rack View)
+             ========================================== -->
+        <div id="dvd-rack-view" class="view-panel" style="display: none;">
+          <div class="dvd-rack-actions" id="dvd-rack-actions" style="display: none; margin-bottom: 12px;">
+            <button class="btn btn-primary" id="add-media-btn"><i class="fa-solid fa-plus"></i> 新增收藏 (DVD / CD)</button>
+          </div>
+          <div class="dvd-rack-grid" id="dvd-rack-grid">
+            <!-- DVD / CD 匣 -->
+          </div>
+        </div>
+
+        <!-- ==========================================
+             衣櫃視圖 (Wardrobe View)
+             ========================================== -->
+        <div id="wardrobe-view" class="view-panel" style="display: none;">
+          <div class="wardrobe-container">
+            <div class="tabs-container" id="wardrobe-tabs">
+              <button class="tab-btn active" data-sub-tab="clothes">衣服</button>
+              <button class="tab-btn" data-sub-tab="shoes">鞋子</button>
+              <button class="tab-btn" data-sub-tab="accessories">飾品</button>
+            </div>
+            
+            <div class="bookshelf-actions" id="wardrobe-actions" style="display: none; margin-bottom: 12px;">
+              <button class="btn btn-primary" id="add-wardrobe-item-btn"><i class="fa-solid fa-plus"></i> 新增收藏品</button>
+            </div>
+
+            <!-- 衣服展示架 (衣架效果) -->
+            <div id="wardrobe-clothes-view" class="wardrobe-tab-content">
+              <div class="closet-clothes-rack" id="closet-clothes-rack">
+                <div class="closet-rod"></div>
+                <!-- 衣服卡片 -->
+              </div>
+            </div>
+
+            <!-- 鞋櫃格子 -->
+            <div id="wardrobe-shoes-view" class="wardrobe-tab-content" style="display: none;">
+              <div class="closet-shoes-rack" id="closet-shoes-rack">
+                <!-- 鞋架格子 -->
+              </div>
+            </div>
+
+            <!-- 珠寶飾品盒 -->
+            <div id="wardrobe-accessories-view" class="wardrobe-tab-content" style="display: none;">
+              <div class="closet-jewelry-box" id="closet-jewelry-box">
+                <!-- 飾品格子 -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             外出 - 景點地圖視圖 (Map View)
+             ========================================== -->
+        <div id="map-view" class="view-panel" style="display: none;">
+          <div class="bookshelf-actions" id="map-actions" style="display: none; margin-bottom: 12px;">
+            <button class="btn btn-primary" id="add-spot-btn"><i class="fa-solid fa-plus"></i> 新增地圖景點</button>
+          </div>
+          <div class="map-layout">
+            <div class="map-sidebar">
+              <div class="map-sidebar-header">
+                <h4 style="font-weight: 700;"><i class="fa-solid fa-list"></i> 景點列表</h4>
+              </div>
+              <div class="map-spot-list" id="map-spot-list">
+                <!-- 景點列表 -->
+              </div>
+            </div>
+            <div class="map-container" id="leaflet-map-container">
+              <!-- Leaflet 地圖容器 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             外出 - 活動/行程行事曆視圖 (Calendar View)
+             ========================================== -->
+        <div id="calendar-view" class="view-panel" style="display: none;">
+          <div class="calendar-layout">
+            <div class="calendar-main">
+              <div class="calendar-header">
+                <h3 class="calendar-title-text" id="calendar-month-year">2026 年 6 月</h3>
+                <div class="calendar-nav-buttons">
+                  <button class="calendar-nav-btn" id="cal-prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                  <button class="calendar-nav-btn" id="cal-today-btn">今天</button>
+                  <button class="calendar-nav-btn" id="cal-next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+              </div>
+              
+              <div class="calendar-grid" id="calendar-grid">
+                <!-- 星期標題與天數格子 -->
+              </div>
+            </div>
+            
+            <div class="calendar-sidebar">
+              <div class="card-title">
+                <span>行程活動</span>
+                <button class="btn btn-primary btn-sm" id="add-event-btn" style="display: none; padding: 2px 6px; font-size: 11px;"><i class="fa-solid fa-plus"></i> 新增</button>
+              </div>
+              <div class="event-list" id="upcoming-events-list">
+                <!-- 近期行程 -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             外出 - 拜訪好友視圖 (Visit View)
+             ========================================== -->
+        <div id="visit-view" class="view-panel" style="display: none;">
+          <!-- 好友清單 -->
+          <div id="friends-list-container" class="card">
+            <div class="card-title">
+              <span><i class="fa-solid fa-users"></i> 好友清單</span>
+              <button class="btn btn-primary btn-sm" id="list-add-friend-btn"><i class="fa-solid fa-user-plus"></i> 新增好友</button>
+            </div>
+            <div class="friends-grid" id="friends-grid">
+              <!-- 動態填入好友卡片 -->
+            </div>
+          </div>
+
+          <!-- Binder 好友冊 (分左右頁) -->
+          <div id="friend-profile-book" class="friend-profile-book" style="display: none;">
+            <div class="book-controls">
+              <button class="btn btn-secondary btn-sm" id="book-back-to-list-btn"><i class="fa-solid fa-arrow-left"></i> 返回首頁</button>
+              <button class="btn btn-danger btn-sm" id="book-delete-friend-btn" style="background: linear-gradient(to bottom, #ff5e62 0%, #ff1e27 100%); border-color: #ff1e27;"><i class="fa-solid fa-user-minus"></i> 刪除好友</button>
+              <div class="page-nav">
+                <button class="btn btn-primary btn-sm" id="book-add-friend-btn"><i class="fa-solid fa-user-plus"></i> 新增好友</button>
+                <button class="btn btn-secondary btn-sm" id="book-prev-btn"><i class="fa-solid fa-chevron-left"></i> 上一位</button>
+                <span id="book-page-indicator" style="font-size: 12px; font-weight: bold; color: var(--primary-dark); align-self: center; margin: 0 6px; user-select: none;">1 / 1</span>
+                <button class="btn btn-secondary btn-sm" id="book-next-btn">下一位 <i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+            
+            <div class="binder-book-container">
+              <div class="binder-book">
+                <!-- 活頁夾左頁 -->
+                <div class="binder-page binder-page-left">
+                  <div class="binder-section">
+                    <h3 class="binder-section-title"><i class="fa-solid fa-address-card"></i> 基本資料</h3>
+                    <div class="binder-profile-header">
+                      <img src="" alt="好友頭像" class="binder-avatar" id="bf-avatar">
+                      <div class="binder-fields">
+                        <div class="binder-field"><span>名字：</span><span id="bf-name" class="handwritten-field"></span></div>
+                        <div class="binder-field"><span>暱稱：</span><span id="bf-nickname" class="handwritten-field"></span></div>
+                        <div class="binder-field"><span>血型：</span><span id="bf-blood" class="handwritten-field"></span></div>
+                        <div class="binder-field"><span>帳號 ID：</span><span id="bf-account-id" class="handwritten-field"></span></div>
+                      </div>
+                    </div>
+                    <div class="binder-fields-grid">
+                      <div class="binder-field"><span>生日：</span><span id="bf-birthday" class="handwritten-field"></span></div>
+                      <div class="binder-field"><span>星座：</span><span id="bf-horoscope" class="handwritten-field"></span></div>
+                      <div class="binder-field"><span>性別：</span><span id="bf-gender" class="handwritten-field"></span></div>
+                      <div class="binder-field"><span>城市：</span><span id="bf-city" class="handwritten-field"></span></div>
+                    </div>
+                  </div>
+                  
+                  <div class="binder-section">
+                    <h3 class="binder-section-title"><i class="fa-solid fa-phone"></i> 聯絡方式</h3>
+                    <div class="binder-fields-grid" style="grid-template-columns: 1fr;">
+                      <div class="binder-field"><span>Email：</span><span id="bf-email" class="handwritten-field"></span></div>
+                      <div class="binder-field"><span>手機：</span><span id="bf-mobile" class="handwritten-field"></span></div>
+                      <div class="binder-field"><span>LINE：</span><span id="bf-line" class="handwritten-field"></span></div>
+                    </div>
+                  </div>
+                  
+                  <div class="visit-room-btn-container">
+                    <button class="btn btn-primary btn-lg" id="visit-room-btn"><i class="fa-solid fa-door-open"></i> 拜訪好友房間</button>
+                  </div>
+                </div>
+
+                <!-- 活頁夾鐵環 -->
+                <div class="binder-rings">
+                  <div class="binder-ring"></div>
+                  <div class="binder-ring"></div>
+                  <div class="binder-ring"></div>
+                  <div class="binder-ring"></div>
+                  <div class="binder-ring"></div>
+                  <div class="binder-ring"></div>
+                </div>
+
+                <!-- 活頁夾右頁 -->
+                <div class="binder-page binder-page-right">
+                  <div class="binder-section">
+                    <h3 class="binder-section-title"><i class="fa-solid fa-chart-pie"></i> 綜合分析 (雷達圖)</h3>
+                    <div class="radar-chart-container">
+                      <div class="radar-chart" id="bf-radar">
+                        <div class="radar-bg-pentagon"></div>
+                        <div class="radar-polygon" id="bf-radar-polygon"></div>
+                        <span class="radar-label label-passion" style="top: 0%; left: 50%; transform: translate(-50%, -100%);">熱情</span>
+                        <span class="radar-label label-humor" style="top: 35%; right: -10%; transform: translate(0%, -50%);">幽默</span>
+                        <span class="radar-label label-procrastination" style="bottom: -5%; right: 10%; transform: translate(0%, 0%);">拖延</span>
+                        <span class="radar-label label-fitness" style="bottom: -5%; left: 10%; transform: translate(0%, 0%);">健身</span>
+                        <span class="radar-label label-foodie" style="top: 35%; left: -10%; transform: translate(0%, -50%);">美食</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="binder-section">
+                    <h3 class="binder-section-title"><i class="fa-solid fa-heart"></i> 我的最愛系列</h3>
+                    <div class="favorites-grid">
+                      <div class="fav-item"><span class="fav-label">窗外的風景 (想去的國家/地方):</span> <span id="fav-country" class="handwritten-field"></span></div>
+                      <div class="fav-item"><span class="fav-label">靈魂的花色 (喜歡的顏色):</span> <span id="fav-color" class="handwritten-field"></span></div>
+                      <div class="fav-item"><span class="fav-label">耳朵的常客 (喜歡的音樂/歌手):</span> <span id="fav-music" class="handwritten-field"></span></div>
+                      <div class="fav-item"><span class="fav-label">百看不厭的螢幕 (喜歡的電影/劇集/動漫):</span> <span id="fav-movie" class="handwritten-field"></span></div>
+                      <div class="fav-item"><span class="fav-label">深夜的熱量來源 (喜歡的食物/飲料):</span> <span id="fav-food" class="handwritten-field"></span></div>
+                      <div class="fav-item"><span class="fav-label">無法抗拒的屬性 (喜歡的人格特質/外型偏好):</span> <span id="fav-trait" class="handwritten-field"></span></div>
+                    </div>
+                  </div>
+
+                  <div class="binder-section">
+                    <h3 class="binder-section-title" id="bf-top3-title"><i class="fa-solid fa-trophy"></i> 我的前三名 (My Top 3)</h3>
+                    <div class="top3-list">
+                      <div class="top3-item"><strong>1st.</strong> <span id="top3-1" class="handwritten-field"></span></div>
+                      <div class="top3-item"><strong>2nd.</strong> <span id="top3-2" class="handwritten-field"></span></div>
+                      <div class="top3-item"><strong>3rd.</strong> <span id="top3-3" class="handwritten-field"></span></div>
+                    </div>
+                  </div>
+
+                  <div class="binder-section">
+                    <h3 class="binder-section-title"><i class="fa-solid fa-tags"></i> 社交與狀態</h3>
+                    <div class="social-tags-list">
+                      <div class="social-tag"><span>社群角色:</span> <span id="social-role" class="handwritten-field"></span></div>
+                      <div class="social-tag"><span>特殊才能:</span> <span id="social-talent" class="handwritten-field"></span></div>
+                      <div class="social-tag"><span>拜訪留言:</span> <span id="social-welcome" class="handwritten-field"></span></div>
+                      <div class="social-tag"><span>冰箱點心 (目前狀態):</span> <span id="social-status" class="handwritten-field"></span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- ==========================================
+           右欄 (Right Column - Sidebar)
+           ========================================== -->
+      <aside class="column" id="right-column">
+        <!-- 個人頭像名片 -->
+        <div class="card profile-card">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300" alt="雷娜塔頭像" class="profile-avatar" id="blog-owner-avatar">
+          <h3 class="profile-name" id="blog-owner-name">雷娜塔</h3>
+          <div class="profile-account-id" id="blog-owner-id" style="font-size: 11.5px; color: var(--primary-dark); font-weight: 700; margin-top: -4px; margin-bottom: 6px; background: rgba(0, 168, 232, 0.08); padding: 2px 8px; border-radius: 10px; display: inline-block;">@renata123</div>
+          <p class="profile-bio" id="blog-owner-bio">歡迎來到我的小角落。這裡記錄了我的日常生活、讀書筆記、影音收藏，還有我四處旅行的足跡。</p>
+          <div class="profile-quick-actions" style="margin-top: 12px; display: flex; gap: 8px; justify-content: center; width: 100%;">
+            <button class="btn btn-secondary btn-sm" id="sidebar-edit-profile-btn" style="flex: 1; font-size: 11px;" title="編輯個人好友冊頁面"><i class="fa-solid fa-key"></i> 編輯資訊</button>
+            <button class="btn btn-primary btn-sm" id="sidebar-write-post-btn" style="flex: 1; font-size: 11px;" title="撰寫新文章"><i class="fa-solid fa-pen-to-square"></i> 寫文章</button>
+          </div>
+        </div>
+
+        <!-- 管理員控制台 (管理員模式才顯示) -->
+        <div class="card admin-card admin-only" id="admin-control-card" style="display: none;">
+          <div class="card-title">
+            <span><i class="fa-solid fa-screwdriver-wrench"></i> 管理員控制台</span>
+          </div>
+          <button class="admin-card-btn" id="write-post-btn"><i class="fa-solid fa-pen-to-square"></i> 撰寫新貼文</button>
+          <button class="admin-card-btn sec" id="export-data-btn"><i class="fa-solid fa-file-export"></i> 匯出與備份資料</button>
+          <button class="admin-card-btn sec" id="import-data-btn"><i class="fa-solid fa-file-import"></i> 匯入與復原資料</button>
+          <button class="admin-card-btn sec" id="edit-settings-btn"><i class="fa-solid fa-cog"></i> 網頁設定 / 修改密碼</button>
+        </div>
+
+        <!-- 熱門推薦 - 紅頭欄位 (修改自截圖 5) -->
+        <div class="card hot-card">
+          <div class="card-title">
+            <span>熱門信息 (今日推薦)</span>
+          </div>
+          <ul class="hot-list" id="popular-posts-box">
+            <!-- 動態填入 -->
+          </ul>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 角色登入 / 輸入解鎖金鑰
+       ========================================================================== -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-key"></i> 權限身分解鎖</h3>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-key">輸入存取密碼 / 金鑰：</label>
+          <input type="password" class="form-input" id="login-key" placeholder="輸入管理員密碼或好友金鑰..." required>
+        </div>
+        <div style="font-size: 11px; color: var(--text-light); margin-bottom: 12px; line-height: 1.4;">
+          提示：<br>
+          管理密碼預設為：<code>admin123</code> (可新增/編輯所有內容)<br>
+          好友密碼預設為：<code>friend123</code> (可瀏覽隱密好友貼文)
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary" id="logout-btn" style="display: none;">登出 / 清除</button>
+          <button type="submit" class="btn btn-primary">提交驗證</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增/編輯貼文 (Blog Editor)
+       ========================================================================== -->
+  <div class="modal-overlay" id="post-editor-modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="post-editor-title">撰寫新貼文</h3>
+      </div>
+      <form id="post-editor-form">
+        <input type="hidden" id="edit-post-id">
+        
+        <div class="form-group">
+          <label class="form-label" for="post-title">貼文標題</label>
+          <input type="text" class="form-input" id="post-title" required placeholder="請輸入標題">
+        </div>
+        
+        <div class="form-group row">
+          <div>
+            <label class="form-label" for="post-parent-category">主分類</label>
+            <select class="form-select" id="post-parent-category" required>
+              <option value="書櫃">書櫃</option>
+              <option value="DVD架">DVD架</option>
+              <option value="衣櫃">衣櫃</option>
+              <option value="書桌">書桌</option>
+              <option value="外出">外出</option>
+              <option value="消息">消息</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="post-sub-category">子分類</label>
+            <select class="form-select" id="post-sub-category" required>
+              <!-- 動態載入對應選項 -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div>
+            <label class="form-label" for="post-image-url">縮圖 / 首頁大圖網址 (URL)</label>
+            <input type="text" class="form-input" id="post-image-url" placeholder="輸入圖片 URL，或留空">
+          </div>
+          <div>
+            <label class="form-label" for="post-privacy">閱讀權限</label>
+            <select class="form-select" id="post-privacy">
+              <option value="public">所有人公開閱讀</option>
+              <option value="friend">僅限好友閱讀 (需解鎖)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="post-tags-input">貼文標籤 (以半形逗號分隔)</label>
+          <input type="text" class="form-input" id="post-tags-input" placeholder="例如：生活隨筆, 向日葵, 穿搭">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="post-summary-input">貼文摘要 / 核心提示</label>
+          <input type="text" class="form-input" id="post-summary-input" required placeholder="簡述文章大綱，會顯示在首頁摘要及核心提示框中">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="post-content-input">貼文內容 (支援 HTML 語法)</label>
+          <!-- 貼文富文本工具列 -->
+          <div class="rich-editor-toolbar" data-target="post-content-input" style="margin-bottom: 6px;">
+            <button type="button" class="tb-btn bold-btn" title="粗體"><i class="fa-solid fa-bold"></i></button>
+            <select class="tb-select size-select" title="字體大小">
+              <option value="">大小</option>
+              <option value="12px">小</option>
+              <option value="14px">中</option>
+              <option value="18px">大</option>
+              <option value="24px">特大</option>
+            </select>
+            <select class="tb-select color-select" title="字體顏色">
+              <option value="">顏色</option>
+              <option value="#1e272e">預設</option>
+              <option value="#e74c3c">紅色</option>
+              <option value="#3498db">藍色</option>
+              <option value="#2ecc71">綠色</option>
+              <option value="#f1c40f">黃色</option>
+              <option value="#9b59b6">紫色</option>
+            </select>
+            <div class="emoji-dropdown-container">
+              <button type="button" class="tb-btn emoji-btn" title="表情符號"><i class="fa-regular fa-face-smile"></i></button>
+              <div class="emoji-picker-popup">
+                <span>😊</span><span>😂</span><span>😍</span><span>👍</span><span>🌟</span>
+                <span>🎉</span><span>🍀</span><span>🌻</span><span>🐱</span><span>🍕</span>
+                <span>❤️</span><span>💡</span><span>🔥</span><span>✨</span><span>🎵</span>
+              </div>
+            </div>
+          </div>
+          <textarea class="form-textarea" id="post-content-input" required placeholder="請撰寫您的部落格內容..."></textarea>
+        </div>
+
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary">儲存並發表</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增書籍封面
+       ========================================================================== -->
+  <div class="modal-overlay" id="book-editor-modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="book-editor-form-title">新增書架書籍</h3>
+      </div>
+      <form id="book-editor-form">
+        <input type="hidden" id="edit-book-id">
+        <div class="form-group">
+          <label class="form-label" for="book-title">書名</label>
+          <input type="text" class="form-input" id="book-title" required placeholder="請輸入書名">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="book-author">作者</label>
+          <input type="text" class="form-input" id="book-author" required placeholder="請輸入作者">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="book-cover">封面圖片 URL</label>
+          <input type="text" class="form-input" id="book-cover" placeholder="輸入圖片 URL，或留空">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="book-desc">書籍簡介</label>
+          <textarea class="form-textarea" id="book-desc" placeholder="請輸入書籍大綱簡介..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="book-thoughts">讀後心得</label>
+          <textarea class="form-textarea" id="book-thoughts" placeholder="請輸入您的讀後心得..."></textarea>
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary" id="book-editor-submit-btn">放到書架上</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 書籍詳細介紹
+       ========================================================================== -->
+  <div class="modal-overlay" id="book-detail-modal">
+    <div class="modal-content" style="max-width: 440px; text-align: center;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <img src="" id="book-info-cover" style="width: 120px; height: 160px; object-fit: cover; border: 1px solid #ccc; box-shadow: var(--shadow-sm); margin: 0 auto 12px auto; display: block;">
+      <h3 class="modal-title" id="book-info-title" style="margin-bottom: 4px;">書名</h3>
+      <div style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">作者：<span id="book-info-author">作者</span></div>
+      
+      <p id="book-info-desc" style="text-align: left; font-size: 13px; line-height: 1.6; color: var(--text-dark); background: #f9f9f9; padding: 12px; border: 1px solid #e0e0e0; margin-bottom: 10px;">
+        書籍簡介內容。
+      </p>
+
+      <div style="text-align: left; margin-bottom: 15px;">
+        <strong style="font-size: 13px; color: var(--primary-dark);"><i class="fa-solid fa-heart"></i> 讀後心得：</strong>
+        <p id="book-info-thoughts" style="font-size: 13px; line-height: 1.6; color: var(--text-dark); background: #fdfefe; padding: 12px; border: 1px dashed var(--primary-color); border-radius: 6px; margin-top: 4px; white-space: pre-line;">
+          暫無心得。
+        </p>
+      </div>
+
+      <div class="form-submit-row" id="book-detail-actions" style="margin-top: 16px; display: flex; gap: 8px;">
+        <button class="btn btn-secondary" id="edit-book-btn" style="flex: 1;"><i class="fa-solid fa-edit"></i> 編輯書籍資訊</button>
+        <button class="btn btn-danger" id="delete-book-btn" style="flex: 1;"><i class="fa-solid fa-trash"></i> 移除這本書</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增收藏 (DVD / CD)
+       ========================================================================== -->
+  <div class="modal-overlay" id="media-editor-modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="media-editor-form-title">新增影音收藏 (CD/DVD)</h3>
+      </div>
+      <form id="media-editor-form">
+        <input type="hidden" id="edit-media-id">
+        <div class="form-group">
+          <label class="form-label" for="media-title">標題 (Title)</label>
+          <input type="text" class="form-input" id="media-title" required placeholder="請輸入作品名稱">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="media-type">收藏類型</label>
+          <select class="form-select" id="media-type" required>
+            <option value="movie">電影 (長方形 DVD 匣)</option>
+            <option value="game">遊戲 (長方形 DVD 匣)</option>
+            <option value="music">音樂 (正方形 CD 匣)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="media-year">發行年份</label>
+          <input type="text" class="form-input" id="media-year" placeholder="例如：2014">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="media-cover">封面圖片 URL</label>
+          <input type="text" class="form-input" id="media-cover" placeholder="輸入封面圖片 URL，或留空">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="media-desc">作品簡介</label>
+          <textarea class="form-textarea" id="media-desc" placeholder="請輸入簡介內容..."></textarea>
+        </div>
+        <!-- 5星評分與評語 -->
+        <div class="form-group">
+          <label class="form-label">五星評分</label>
+          <div class="star-rating-input" id="media-star-rating" style="font-size: 20px; color: #ffaa00; cursor: pointer; display: flex; gap: 6px; margin: 4px 0;">
+            <i class="fa-regular fa-star" data-val="1"></i>
+            <i class="fa-regular fa-star" data-val="2"></i>
+            <i class="fa-regular fa-star" data-val="3"></i>
+            <i class="fa-regular fa-star" data-val="4"></i>
+            <i class="fa-regular fa-star" data-val="5"></i>
+          </div>
+          <input type="hidden" id="media-rating-value" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="media-comment">評語項目</label>
+          <textarea class="form-textarea" id="media-comment" placeholder="請輸入您對此影音收藏的評語..."></textarea>
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary" id="media-editor-submit-btn">放入收藏櫃</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: CD/DVD 詳細介紹與刪除
+       ========================================================================== -->
+  <div class="modal-overlay" id="media-detail-modal">
+    <div class="modal-content" style="max-width: 440px; text-align: center;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <img src="" id="media-info-cover" style="width: 120px; aspect-ratio: 1/1; object-fit: cover; border: 1px solid #ccc; box-shadow: var(--shadow-sm); margin: 0 auto 12px auto; display: block;">
+      <h3 class="modal-title" id="media-info-title" style="margin-bottom: 4px;">影音標題</h3>
+      <div style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">發行年份：<span id="media-info-year">2026</span></div>
+      
+      <!-- Stars and Comments -->
+      <div style="margin-bottom: 12px; display: flex; justify-content: center; gap: 4px; font-size: 18px; color: #ffaa00;" id="media-info-stars">
+        <!-- Generated stars -->
+      </div>
+
+      <p id="media-info-desc" style="text-align: left; font-size: 13px; line-height: 1.6; color: var(--text-dark); background: #f9f9f9; padding: 12px; border: 1px solid #e0e0e0; margin-bottom: 10px;">
+        影音簡介內容。
+      </p>
+
+      <div style="text-align: left; margin-bottom: 15px;" id="media-info-comment-box">
+        <strong style="font-size: 13px; color: var(--accent-dark);"><i class="fa-solid fa-comment-dots"></i> 評語項目：</strong>
+        <p id="media-info-comment" style="font-size: 13px; line-height: 1.6; color: var(--text-dark); background: #fdfefe; padding: 12px; border: 1px dashed var(--accent-color); border-radius: 6px; margin-top: 4px; white-space: pre-line;">
+          暫無評語。
+        </p>
+      </div>
+
+      <div class="form-submit-row" id="media-detail-actions" style="margin-top: 16px; display: flex; gap: 8px;">
+        <button class="btn btn-secondary" id="edit-media-btn" style="flex: 1;"><i class="fa-solid fa-edit"></i> 編輯收藏資訊</button>
+        <button class="btn btn-danger" id="delete-media-btn" style="flex: 1;"><i class="fa-solid fa-trash"></i> 刪除此影音收藏</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增衣物/飾品
+       ========================================================================== -->
+  <div class="modal-overlay" id="wardrobe-editor-modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="wardrobe-editor-form-title">新增衣物或飾品</h3>
+      </div>
+      <form id="wardrobe-editor-form">
+        <input type="hidden" id="edit-w-id">
+        <div class="form-group">
+          <label class="form-label" for="w-title">名稱</label>
+          <input type="text" class="form-input" id="w-title" required placeholder="請輸入名稱">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="w-brand">品牌 <span style="color: red;">*</span></label>
+          <input type="text" class="form-input" id="w-brand" required placeholder="請輸入品牌（例如：Nike）">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="w-type">分類</label>
+          <select class="form-select" id="w-type" required>
+            <option value="clothes">衣服 (掛桿展示)</option>
+            <option value="shoes">鞋子 (鞋架格展示)</option>
+            <option value="accessories">飾品 (飾品九宮格展示)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="w-image">圖片 URL</label>
+          <input type="text" class="form-input" id="w-image" placeholder="輸入圖片 URL，或留空">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="w-desc">備註簡述</label>
+          <input type="text" class="form-input" id="w-desc" placeholder="例如：夏日輕薄麻布洋裝">
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary" id="wardrobe-editor-submit-btn">放入衣櫃</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增地圖景點
+       ========================================================================== -->
+  <div class="modal-overlay" id="spot-editor-modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title">新增外出景點</h3>
+      </div>
+      <form id="spot-editor-form">
+        <div class="form-group">
+          <label class="form-label" for="spot-name">景點名稱</label>
+          <input type="text" class="form-input" id="spot-name" required placeholder="例如：阿里山國家公園">
+        </div>
+        <div class="form-group row">
+          <div>
+            <label class="form-label" for="spot-lat">緯度 (Latitude)</label>
+            <input type="number" step="0.0001" class="form-input" id="spot-lat" required placeholder="例如：23.5111">
+          </div>
+          <div>
+            <label class="form-label" for="spot-lng">經度 (Longitude)</label>
+            <input type="number" step="0.0001" class="form-input" id="spot-lng" required placeholder="例如：120.8031">
+          </div>
+        </div>
+        <div style="font-size: 11px; color: var(--text-light); margin-top: -6px; margin-bottom: 10px;">
+          提示：您可以透過 Google 地圖右鍵點擊，複製該地點的經緯度數值。
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="spot-desc">景點介紹描述</label>
+          <textarea class="form-textarea" id="spot-desc" placeholder="請輸入景點特色介紹描述..."></textarea>
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary">加入景點標記</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增行事曆行程
+       ========================================================================== -->
+  <div class="modal-overlay" id="event-editor-modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title">新增行程活動</h3>
+      </div>
+      <form id="event-editor-form">
+        <div class="form-group">
+          <label class="form-label" for="event-title">活動名稱</label>
+          <input type="text" class="form-input" id="event-title" required placeholder="請輸入活動或行程標題">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="event-date">活動日期</label>
+          <input type="date" class="form-input" id="event-date" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="event-desc">行程詳細說明</label>
+          <textarea class="form-textarea" id="event-desc" placeholder="輸入行程備忘細節..."></textarea>
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary">儲存行程</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 網頁基本設定 / 修改密碼
+       ========================================================================== -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-cog"></i> 網頁基本設定</h3>
+      </div>
+      <form id="settings-form">
+        <div class="form-group row">
+          <div>
+            <label class="form-label" for="settings-title">部落格標題</label>
+            <input type="text" class="form-input" id="settings-title" required>
+          </div>
+          <div>
+            <label class="form-label" for="settings-subtitle">英文副標題</label>
+            <input type="text" class="form-input" id="settings-subtitle" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="settings-owner">站長名稱</label>
+          <input type="text" class="form-input" id="settings-owner" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profile-avatar">個人頭像 (Avatar URL / 上傳檔案)</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" class="form-input" id="profile-avatar" placeholder="請輸入圖片網址 (URL)..." style="flex: 1;">
+            <label class="btn btn-secondary" style="margin: 0; cursor: pointer; white-space: nowrap; height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0 12px; font-size: 12px; border-radius: 6px;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> 上傳圖片
+              <input type="file" id="profile-avatar-file" accept="image/*" style="display: none;">
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profile-account-id">個人帳號 ID (Account ID) *</label>
+          <input type="text" class="form-input" id="profile-account-id" required placeholder="例如：renata123">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="settings-bio">個人簡介 (Bio)</label>
+          <textarea class="form-textarea" id="settings-bio" required></textarea>
+        </div>
+
+        <!-- 編輯我的好友冊檔案 -->
+        <details class="settings-details" style="margin-top: 12px; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: rgba(255,255,255,0.4);">
+          <summary style="cursor: pointer; font-weight: 600; padding: 6px; color: var(--primary-color);">
+            <i class="fa-solid fa-address-book"></i> 編輯我的好友冊檔案
+          </summary>
+          <div style="padding-top: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto;">
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-nickname">暱稱</label>
+                <input type="text" class="form-input" id="profile-nickname">
+              </div>
+              <div>
+                <label class="form-label" for="profile-blood">血型</label>
+                <input type="text" class="form-input" id="profile-blood">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-birthday">生日</label>
+                <input type="date" class="form-input" id="profile-birthday">
+              </div>
+              <div>
+                <label class="form-label" for="profile-horoscope">星座</label>
+                <input type="text" class="form-input" id="profile-horoscope">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-gender">性別</label>
+                <input type="text" class="form-input" id="profile-gender">
+              </div>
+              <div>
+                <label class="form-label" for="profile-city">城市</label>
+                <input type="text" class="form-input" id="profile-city">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-email">Email</label>
+                <input type="email" class="form-input" id="profile-email">
+              </div>
+              <div>
+                <label class="form-label" for="profile-mobile">手機</label>
+                <input type="text" class="form-input" id="profile-mobile">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-facebook">Facebook</label>
+                <input type="text" class="form-input" id="profile-facebook">
+              </div>
+              <div>
+                <label class="form-label" for="profile-line">LINE</label>
+                <input type="text" class="form-input" id="profile-line">
+              </div>
+            </div>
+
+            <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-top: 8px; font-size: 13px;">綜合分析 (0-100)</h4>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-passion">熱情</label>
+                <input type="number" min="0" max="100" class="form-input" id="profile-passion">
+              </div>
+              <div>
+                <label class="form-label" for="profile-humor">幽默</label>
+                <input type="number" min="0" max="100" class="form-input" id="profile-humor">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-procrastination">拖延</label>
+                <input type="number" min="0" max="100" class="form-input" id="profile-procrastination">
+              </div>
+              <div>
+                <label class="form-label" for="profile-fitness">健身</label>
+                <input type="number" min="0" max="100" class="form-input" id="profile-fitness">
+              </div>
+              <div>
+                <label class="form-label" for="profile-foodie">美食</label>
+                <input type="number" min="0" max="100" class="form-input" id="profile-foodie">
+              </div>
+            </div>
+
+            <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-top: 8px; font-size: 13px;">我的最愛系列</h4>
+            <div class="form-group">
+              <label class="form-label" for="profile-fav-country">窗外的風景 (想去的國家/地方)</label>
+              <input type="text" class="form-input" id="profile-fav-country">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-fav-color">靈魂的花色 (喜歡的顏色)</label>
+              <input type="text" class="form-input" id="profile-fav-color">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-fav-music">耳朵的常客 (喜歡的音樂/歌手)</label>
+              <input type="text" class="form-input" id="profile-fav-music">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-fav-movie">百看不厭的螢幕 (喜歡的電影/劇集/動漫)</label>
+              <input type="text" class="form-input" id="profile-fav-movie">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-fav-food">深夜的熱量來源 (喜歡的食物/飲料)</label>
+              <input type="text" class="form-input" id="profile-fav-food">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-fav-trait">無法抗拒的屬性 (喜歡的人格特質/外型偏好)</label>
+              <input type="text" class="form-input" id="profile-fav-trait">
+            </div>
+
+            <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-top: 8px; font-size: 13px;">我的前三名 (My Top 3)</h4>
+            <div class="form-group">
+              <label class="form-label" for="profile-top3-title">自訂主題排行</label>
+              <input type="text" class="form-input" id="profile-top3-title" placeholder="例如：救贖我的三樣東西">
+            </div>
+            <div class="form-group row">
+              <div>
+                <label class="form-label" for="profile-top3-1">第一名</label>
+                <input type="text" class="form-input" id="profile-top3-1">
+              </div>
+              <div>
+                <label class="form-label" for="profile-top3-2">第二名</label>
+                <input type="text" class="form-input" id="profile-top3-2">
+              </div>
+              <div>
+                <label class="form-label" for="profile-top3-3">第三名</label>
+                <input type="text" class="form-input" id="profile-top3-3">
+              </div>
+            </div>
+
+            <h4 style="border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-top: 8px; font-size: 13px;">社交標籤與狀態</h4>
+            <div class="form-group">
+              <label class="form-label" for="profile-social-role">社群角色 (以逗號分隔)</label>
+              <input type="text" class="form-input" id="profile-social-role" placeholder="例如：熱唱王, 潛水大師">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-social-talent">特殊才能</label>
+              <input type="text" class="form-input" id="profile-social-talent">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-social-welcome">拜訪留言</label>
+              <input type="text" class="form-input" id="profile-social-welcome">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-social-status">冰箱點心 (目前狀態)</label>
+              <input type="text" class="form-input" id="profile-social-status">
+            </div>
+          </div>
+        </details>
+
+        <div class="form-group row" style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
+          <div>
+            <label class="form-label" for="settings-admin-key">系統管理密碼 (Admin Key)</label>
+            <input type="text" class="form-input" id="settings-admin-key" required placeholder="預設 admin123">
+          </div>
+          <div>
+            <label class="form-label" for="settings-friend-key">好友解鎖金鑰 (Friend Key)</label>
+            <input type="text" class="form-input" id="settings-friend-key" required placeholder="預設 friend123">
+          </div>
+        </div>
+        <div class="form-submit-row">
+          <button type="button" class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button type="submit" class="btn btn-primary">儲存設定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 匯出/匯入資料面板 (Export/Import JSON)
+       ========================================================================== -->
+  <div class="modal-overlay" id="io-modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="io-modal-title">資料管理控制</h3>
+      </div>
+      
+      <!-- 匯出面板 -->
+      <div id="export-panel" style="display: none;">
+        <p style="font-size: 13px; color: var(--text-dark); margin-bottom: 12px; line-height: 1.5;">
+          本系統將您新增的所有文章、收藏與個人設定打包為單一檔案。
+          <br><strong>您可以將其下載為 <code>data.js</code> 並直接替換掉本機網頁目錄下的同名檔案。這樣部署到伺服器後，所有訪客都能看見您最新發表的內容！</strong>
+        </p>
+        <div class="form-submit-row">
+          <button class="btn btn-secondary modal-cancel-btn">關閉</button>
+          <button class="btn btn-primary" id="download-data-js-btn"><i class="fa-solid fa-download"></i> 儲存並匯出最新 data.js</button>
+        </div>
+      </div>
+      
+      <!-- 匯入面板 -->
+      <div id="import-panel" style="display: none;">
+        <p style="font-size: 13px; color: var(--text-dark); margin-bottom: 12px; line-height: 1.5;">
+          如果您之前備份過資料，或是想載入現有的 <code>data.js</code>，請選擇檔案進行回復：
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="import-file-input">選擇您的 data.js 備份檔：</label>
+          <input type="file" id="import-file-input" accept=".js,.json" class="form-input">
+        </div>
+        <div style="font-size: 11px; color: var(--danger-color); font-weight: 600; margin-top: -6px; margin-bottom: 16px;">
+          警告：匯入新資料將會完全覆蓋掉目前瀏覽器中已儲存的所有貼文與收藏！
+        </div>
+        <div class="form-submit-row">
+          <button class="btn btn-secondary modal-cancel-btn">取消</button>
+          <button class="btn btn-primary" id="execute-import-btn" disabled><i class="fa-solid fa-file-import"></i> 確定覆蓋並匯入</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 新增好友
+       ========================================================================== -->
+  <div class="modal-overlay" id="add-friend-modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-user-plus"></i> 新增好友</h3>
+      </div>
+      <div class="form-group" style="margin-top: 15px;">
+        <label class="form-label" for="search-friend-id-input">輸入好友帳號 ID：</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" class="form-input" id="search-friend-id-input" placeholder="例如：xiaohua123, datong456" style="flex: 1;">
+          <button type="button" class="btn btn-primary" id="search-friend-btn" style="white-space: nowrap; padding: 6px 14px;"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
+        </div>
+      </div>
+      <!-- 搜尋結果顯示區 (預設隱藏) -->
+      <div id="search-friend-result" style="display: none; background: rgba(255,255,255,0.6); border: 1px solid rgba(0, 168, 232, 0.25); border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: inset 0 1px 2px rgba(255,255,255,0.5);">
+        <img id="sf-avatar" src="" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: var(--shadow-sm); object-fit: cover; margin: 0 auto 10px auto; display: block;">
+        <h4 id="sf-name" style="color: var(--primary-dark); font-weight: 700; margin-bottom: 2px;">好友名字</h4>
+        <div id="sf-account-id" style="font-size: 11px; color: var(--primary-color); font-weight: 600; margin-bottom: 6px; background: rgba(0, 168, 232, 0.08); padding: 2px 8px; border-radius: 10px; display: inline-block;">@id</div>
+        <p id="sf-nickname" style="font-size: 12px; color: var(--text-light); margin-bottom: 6px;">暱稱</p>
+        <p id="sf-status" style="font-size: 12px; color: var(--text-dark); background: rgba(255,255,255,0.8); padding: 6px; border-radius: 4px; margin-bottom: 12px; border: 1px solid rgba(0,0,0,0.05); text-align: center; white-space: normal;">狀態</p>
+        <button type="button" class="btn btn-primary btn-sm" id="confirm-add-friend-btn" style="background: linear-gradient(to bottom, #7ebd26 0%, #5d8e17 100%); border-color: #5d8e17; width: 100%;"><i class="fa-solid fa-plus"></i> 加為好友</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       彈窗 Modal: 系統通知中心 (Notification Center)
+       ========================================================================== -->
+  <div class="modal-overlay" id="notification-modal">
+    <div class="modal-content" style="max-width: 440px;">
+      <button class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--primary-dark); font-weight: 700;"><i class="fa-solid fa-bell"></i> 系統通知中心</h3>
+      </div>
+      <div class="notification-list-container" id="notification-list-box" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+        <!-- 通知項目將動態渲染於此 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Firebase 註冊登入頁面 (Auth View)
+       ========================================================================== -->
+  <div id="auth-view" class="auth-container" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <i class="fa-solid fa-sun-plant-wilt" style="font-size: 32px; color: var(--accent-color); margin-bottom: 8px;"></i>
+        <h2>雷娜塔的家</h2>
+        <p>RENATA'S HOME</p>
+      </div>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-login-btn">登入</button>
+        <button class="auth-tab-btn" id="tab-register-btn">註冊</button>
+      </div>
+      
+      <!-- 登入表單 -->
+      <form id="auth-login-form" class="auth-form" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="login-email" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">電子信箱 (Email)</label>
+          <input type="email" class="form-input" id="login-email" required placeholder="example@email.com" style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="login-password" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">密碼 (Password)</label>
+          <input type="password" class="form-input" id="login-password" required placeholder="請輸入密碼" style="width: 100%; box-sizing: border-box;">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg auth-submit-btn" style="width: 100%; margin-top: 10px;">立即登入</button>
+      </form>
+
+      <!-- 註冊表單 (預設隱藏) -->
+      <form id="auth-register-form" class="auth-form" style="display: none; flex-direction: column; gap: 12px; margin-top: 15px;">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="register-email" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">電子信箱 (Email)</label>
+          <input type="email" class="form-input" id="register-email" required placeholder="example@email.com" style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="register-password" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">密碼 (Password)</label>
+          <input type="password" class="form-input" id="register-password" required placeholder="密碼需大於 6 位數" style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="register-password-confirm" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">確認密碼</label>
+          <input type="password" class="form-input" id="register-password-confirm" required placeholder="請再次輸入密碼" style="width: 100%; box-sizing: border-box;">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg auth-submit-btn" style="background: linear-gradient(to bottom, #7ebd26 0%, #5d8e17 100%); border-color: #5d8e17; width: 100%; margin-top: 10px;">註冊帳號</button>
+      </form>
+
+      <!-- 個人檔案設定表單 (註冊成功後顯示) -->
+      <form id="auth-setup-form" class="auth-form" style="display: none; flex-direction: column; gap: 12px; margin-top: 15px; max-height: 250px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+        <h3 style="color: var(--primary-dark); font-weight: 700; font-size: 14px; margin-bottom: 5px; text-align: center;"><i class="fa-solid fa-user-gear"></i> 建立您的個人檔案</h3>
+        
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="setup-account-id" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">個人帳號 ID (不可重複) *</label>
+          <input type="text" class="form-input" id="setup-account-id" required placeholder="例如：renata123" style="width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="setup-name" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">站長名稱 *</label>
+          <input type="text" class="form-input" id="setup-name" required placeholder="您的名字或稱呼" style="width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">個人頭像 (Avatar URL / 上傳檔案)</label>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <input type="text" class="form-input" id="setup-avatar" placeholder="請輸入圖片網址 (URL)..." style="flex: 1; box-sizing: border-box; height: 32px; font-size: 12px;">
+            <label class="btn btn-secondary" style="margin: 0; cursor: pointer; white-space: nowrap; height: 32px; font-size: 11px; display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> 上傳頭像
+              <input type="file" id="setup-avatar-file" accept="image/*" style="display: none;">
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="setup-nickname" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">暱稱</label>
+          <input type="text" class="form-input" id="setup-nickname" placeholder="例如：小娜" style="width: 100%; box-sizing: border-box;">
+        </div>
+
+        <div class="form-group row" style="display: flex; gap: 8px; justify-content: space-between;">
+          <div style="flex: 1; text-align: left;">
+            <label class="form-label" for="setup-gender" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">性別</label>
+            <input type="text" class="form-input" id="setup-gender" placeholder="例如：女" style="width: 100%; box-sizing: border-box;">
+          </div>
+          <div style="flex: 1; text-align: left;">
+            <label class="form-label" for="setup-blood" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">血型</label>
+            <input type="text" class="form-input" id="setup-blood" placeholder="例如：A" style="width: 100%; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div class="form-group row" style="display: flex; gap: 8px; justify-content: space-between;">
+          <div style="flex: 1; text-align: left;">
+            <label class="form-label" for="setup-birthday" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">生日</label>
+            <input type="date" class="form-input" id="setup-birthday" style="width: 100%; box-sizing: border-box;">
+          </div>
+          <div style="flex: 1; text-align: left;">
+            <label class="form-label" for="setup-horoscope" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">星座</label>
+            <input type="text" class="form-input" id="setup-horoscope" placeholder="例如：雙子座" style="width: 100%; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="setup-city" style="font-weight: 600; font-size: 11px; margin-bottom: 4px; display: block;">居住城市</label>
+          <input type="text" class="form-input" id="setup-city" placeholder="例如：台北市" style="width: 100%; box-sizing: border-box;">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg auth-submit-btn" style="width: 100%; margin-top: 10px; background: linear-gradient(to bottom, #7ebd26 0%, #5d8e17 100%); border-color: #5d8e17;">儲存並建立個人空間</button>
+      </form>
+      
+      <div class="auth-divider" style="margin: 20px 0; position: relative; border-bottom: 1px solid rgba(0,0,0,0.08);">
+        <span style="position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: rgb(228, 241, 248); padding: 0 10px; font-size: 10.5px; color: var(--text-light);">或使用以下方式</span>
+      </div>
+      
+      <button type="button" class="btn btn-secondary btn-lg google-auth-btn" id="google-signin-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> 使用 Google 帳號登入
+      </button>
+
+      <div class="auth-guest-link" style="margin-top: 20px; font-size: 11.5px;">
+        <a href="#" id="auth-guest-btn" style="color: var(--primary-dark); text-decoration: none; font-weight: 600;">先以訪客身分參觀 <i class="fa-solid fa-angle-right"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript 腳本載入 -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Firebase Compat SDK 載入與系統配置 (相容 file:/// 本地協定) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="src/firebase.js"></script>
+  <script src="src/components/Auth.js"></script>
+</body>
+</html>
