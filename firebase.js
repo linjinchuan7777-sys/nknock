@@ -1,6 +1,6 @@
 // Firebase 配置資訊 (自您的 Firebase 專案「20260605-01」自動獲取)
 const firebaseConfig = {
-  apiKey: "AIzaSyAk5maKybfVI7QOrNigyAY7roRh61XEmnM",
+  apiKey: "AIzaSyAmoW8QnsjIJf2_n1P-qNe7cNmpqW3SM9o",
   authDomain: "project-5995689044921351338.firebaseapp.com",
   projectId: "project-5995689044921351338",
   storageBucket: "project-5995689044921351338.firebasestorage.app",
